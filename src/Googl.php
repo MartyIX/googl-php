@@ -29,7 +29,7 @@ class Shortener
 
         private static $buffer = array();
 
-        function __construct($apiKey = null)
+        public function __construct($apiKey = null)
         {
                 # Extended output mode
                 $extended = false;
@@ -55,25 +55,41 @@ class Shortener
         {
                 # Check buffer
                 if (!$extended && !$this->extended && !empty(self::$buffer[$url])) {
-                        return self::$buffer[$url];
-                }
-
-                # Payload
-                $data = array('longUrl' => $url);
-                $data_string = '{ "longUrl": "' . $url . '" }';
-
-                # Set cURL options
-                curl_setopt($this->ch, CURLOPT_POST, count($data));
-                curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data_string);
-                curl_setopt($this->ch, CURLOPT_HTTPHEADER, Array('Content-Type: application/json'));
-
-                if ($extended || $this->extended) {
-                        return json_decode(curl_exec($this->ch));
+                        $result = self::$buffer[$url];
                 } else {
-                        $ret = json_decode(curl_exec($this->ch))->id;
-                        self::$buffer[$url] = $ret;
-                        return $ret;
+                        # Payload
+                        $data = array('longUrl' => $url);
+                        $data_string = '{ "longUrl": "' . $url . '" }';
+
+                        # Set cURL options
+                        curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, 0);
+                        curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 0);
+                        curl_setopt($this->ch, CURLOPT_POST, count($data));
+                        curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data_string);
+                        curl_setopt($this->ch, CURLOPT_HTTPHEADER, Array('Content-Type: application/json'));
+
+                        $response = curl_exec($this->ch);
+
+                        if ($response === false) {
+                                throw new \Exception("Error occurred: " . curl_error($this->ch));
+                        }
+
+                        $decoded = json_decode($response);
+
+                        if ($extended || $this->extended) {
+                                $result = $decoded;
+                        } else {
+                                if (!property_exists($decoded, 'id')) {
+                                        throw new \Exception("Property 'id' is not defined. Response is: " . json_encode($decoded));
+                                }
+
+                                $id = $decoded->id;
+                                self::$buffer[$url] = $id;
+                                $result = $id;
+                        }
                 }
+
+                return $result;
         }
 
         public function expand($url, $extended = false)
@@ -89,7 +105,7 @@ class Shortener
                 }
         }
 
-        function __destruct()
+        public function __destruct()
         {
                 # Close the curl handle
                 curl_close($this->ch);
