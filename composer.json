@@ -1,0 +1,15 @@
+{
+        "name": "MartyIX/googl-php",
+        "type": "library",
+        "description": "Fork of sebi/googl-php.",
+        "keywords": ["url", "shortener"],
+        "homepage": "",
+        "license": ["GPL-3.0"],
+        "authors": [{
+                "name": "Sebastian Wyder",
+                "homepage": "https://www.wyderits.ch"
+        }],
+        "require": {
+                "php": ">=5.3"
+        }
+}
