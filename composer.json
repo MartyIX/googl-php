@@ -1,5 +1,5 @@
 {
-        "name": "MartyIX/googl-php",
+        "name": "martyix/googl-php",
         "type": "library",
         "description": "Fork of sebi/googl-php.",
         "keywords": ["url", "shortener"],
