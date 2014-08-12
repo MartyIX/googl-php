@@ -1,5 +1,7 @@
 <?php
 
+namespace Googl;
+
 /**
  * This file is part of googl-php
  *
@@ -18,7 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Googl
+class Shortener
 {
         public $extended;
         private $target;
